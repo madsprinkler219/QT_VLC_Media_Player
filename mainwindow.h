@@ -32,6 +32,7 @@ public:
     void playShow(QString);
     void playSeason(QString,QString);
     void playMedia(QString);
+    bool userEndClick;
 
 private slots:
     void on_pushButton_clicked();
@@ -40,6 +41,8 @@ private slots:
     void on_listWidget_3_currentRowChanged(int currentRow);
     void on_pushButton_4_clicked();
     void on_close();
+
+    void on_pushButton_5_clicked();
 
 private:
     Ui::MainWindow *ui;

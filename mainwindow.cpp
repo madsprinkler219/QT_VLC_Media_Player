@@ -16,6 +16,7 @@
 //#include <vlc/libvlc_version.h>
 #include <vlc/vlc.h>
 //#include <vlc/deprecated.h>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::MainWindow)
 {
@@ -36,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::MainWin
     mediaExtensions.append(".avi");
 
     searchPaths.append("//MEDIA-PC/Users/MEDIA/Desktop/Home Videos");
-    //searchPaths.append("C:/Users/Kevin/Videos");
+
     mediaPath.clear();
     mediaType.clear();
     mediaMovie.clear();
@@ -168,7 +169,20 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::videoFinished()
 {
-    qDebug() << "TEST";
+    QMessageBox *box = new QMessageBox();
+    box->setText("Continue with next episode?");
+    box->addButton(QMessageBox::Yes);
+    box->addButton(QMessageBox::No);
+    int ret = box->exec();
+
+    if (ret == 16384)
+    {
+        this->userEndClick = false;
+    }
+    else if (ret == 65536)
+    {
+        this->userEndClick = true;
+    }
 }
 
 void MainWindow::on_listWidget_2_currentRowChanged(int currentRow)
@@ -270,25 +284,33 @@ void MainWindow::playMedia(QString thing)
 
 void MainWindow::playShow(QString show)
 {
+    userEndClick = false;
     QStringList seasons = this->seasonMap[show];
     for (int i=0;i<seasons.size();i++)
     {
         QStringList episodes = this->episodeMap[show + "," + seasons[i]];
         for (int j=0;j<episodes.size();j++)
         {
-            playMedia(show + "," + seasons[i] + "," + episodes[j]);
-            play->waitForFinished(-1);
+            if (!userEndClick)
+            {
+                playMedia(show + "," + seasons[i] + "," + episodes[j]);
+                play->waitForFinished(-1);
+            }
         }
     }
 }
 
 void MainWindow::playSeason(QString show,QString season)
 {
+    userEndClick = false;
     QStringList episodes = this->episodeMap[show + "," + season];
     for (int j=0;j<episodes.size();j++)
     {
-        playMedia(show + "," + season + "," + episodes[j]);
-        play->waitForFinished(-1);
+        if (!userEndClick)
+        {
+            playMedia(show + "," + season + "," + episodes[j]);
+            play->waitForFinished(-1);
+        }
     }
 }
 
@@ -397,4 +419,10 @@ void MainWindow::changeFocus(int change)
             this->ui->listWidget_3->setFocus();
         }
     }
+}
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    userEndClick = true;
+    play->close();
 }
