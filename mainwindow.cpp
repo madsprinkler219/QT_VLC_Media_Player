@@ -30,13 +30,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::MainWin
     this->ui->listWidget_3->installEventFilter(this);
     this->ui->listWidget_4->installEventFilter(this);
 
+    addMediaFolder("//MEDIA-PC/Users/MEDIA/Desktop/Home Videos");
+    addMedia();
+}
+
+void MainWindow::addMediaFolder(QString path)
+{
     QVector<QString> mediaExtensions;
     mediaExtensions.append(".m4v");
     mediaExtensions.append(".mkv");
     mediaExtensions.append(".mp4");
     mediaExtensions.append(".avi");
 
-    searchPaths.append("//MEDIA-PC/Users/MEDIA/Desktop/Home Videos");
+    searchPaths.clear();
+    searchPaths.append(path);
 
     mediaPath.clear();
     mediaType.clear();
@@ -100,8 +107,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::MainWin
             }
         }
     }
-
-    addMedia();
 }
 
 void MainWindow::testVLC()
@@ -261,7 +266,20 @@ void MainWindow::on_pushButton_4_clicked()
 
 void MainWindow::on_close()
 {
-    qDebug() << "TEST1";
+    QMessageBox *box = new QMessageBox();
+    box->setText("Continue with next episode?");
+    box->addButton(QMessageBox::Yes);
+    box->addButton(QMessageBox::No);
+    int ret = box->exec();
+
+    if (ret == 16384)
+    {
+        this->userEndClick = false;
+    }
+    else if (ret == 65536)
+    {
+        this->userEndClick = true;
+    }
 }
 
 void MainWindow::playMedia(QString thing)
@@ -425,4 +443,19 @@ void MainWindow::on_pushButton_5_clicked()
 {
     userEndClick = true;
     play->close();
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    //Watch Show
+    QString show = this->ui->listWidget_2->currentItem()->text();
+    playShow(show);
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    //Watch Season
+    QString show = this->ui->listWidget_2->currentItem()->text();
+    QString season = this->ui->listWidget_3->currentItem()->text();
+    playSeason(show,season);
 }
