@@ -21,6 +21,18 @@ Settings::Settings(QWidget *parent) :
         this->ui->tableWidget->setItem(i,0,new QTableWidgetItem(paths[i].toString()));
         this->ui->tableWidget->setColumnWidth(0,350);
     }
+
+    bool fullScreen = settings.value("fullScreen").toBool();
+    bool subs  = settings.value("subtitles").toBool();
+
+    if (fullScreen)
+    {
+        this->ui->checkBox->setChecked(true);
+    }
+    if (subs)
+    {
+        this->ui->checkBox_2->setChecked(true);
+    }
 }
 
 Settings::~Settings()
@@ -43,6 +55,9 @@ void Settings::on_pushButton_clicked()
     }
 
     settings.setValue("mediaPaths",(QVariant) paths);
+    settings.setValue("fullScreen",(QVariant) this->ui->checkBox->isChecked());
+    settings.setValue("subtitles", (QVariant) this->ui->checkBox_2->isChecked());
+
     this->close();
 }
 

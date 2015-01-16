@@ -13,6 +13,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::MainWin
 {
     QSettings settings("KevinPC");
     this->vlcLocation = settings.value("vlcLocation").toString();
+    this->fullScreen = settings.value("fullScreen").toBool();
+    this->subs = settings.value("subtitles").toBool();
 
     ui->setupUi(this);
 
@@ -101,22 +103,6 @@ void MainWindow::addMediaFolder(QString path)
     }
 }
 
-void MainWindow::testVLC()
-{
-   libvlc_instance_t *inst;
-   libvlc_media_player_t *mp;
-   libvlc_media_t *m;
-   char ops1[] = "fullscreen";
-   char const* const ops2[] = {"--fullscreen"};
-
-   inst = libvlc_new(1,ops2);
-   m = libvlc_media_new_location (inst, "file:///C:/Users/Kevin/Videos/TV_Shows/AmericanHorrorStory/Season4/american.horror.story.401.hdtv-lol.mp4");
-   //libvlc_media_add_option(m,ops);
-   mp = libvlc_media_player_new_from_media (m);
-   //libvlc_media_release (m);
-   libvlc_media_player_play (mp);
-}
-
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -153,13 +139,21 @@ void MainWindow::addMedia()
 
 void MainWindow::on_pushButton_clicked()
 {
-    //this->testVLC();
+    QString options;
+    if (this->fullScreen)
+    {
+        options = "--fullscreen,";
+    }
+    if (this->subs)
+    {
+        options = options + "--no-sub-autodetect-file,";
+    }
 
     //Play Movie
     play = new QProcess();
     play->setProgram(this->vlcLocation);
     play->setWorkingDirectory(mediaFolder[this->ui->listWidget->currentRow()]);
-    play->setArguments(QString("--fullscreen," + mediaMovie[this->ui->listWidget->currentRow()]).split(","));
+    play->setArguments(QString(options + mediaMovie[this->ui->listWidget->currentRow()]).split(","));
     connect(play,SIGNAL(finished(int)),this,SLOT(videoFinished()));
     play->start();
 }
@@ -239,7 +233,15 @@ void MainWindow::on_listWidget_3_currentRowChanged(int currentRow)
 
 void MainWindow::on_pushButton_4_clicked()
 {
-    //this->testVLC();
+    QString options;
+    if (this->fullScreen)
+    {
+        options = "--fullscreen,";
+    }
+    if (this->subs)
+    {
+        options = options + "--no-sub-autodetect-file,";
+    }
 
     //Play show
     QString show = this->ui->listWidget_2->currentItem()->text();
@@ -251,7 +253,7 @@ void MainWindow::on_pushButton_4_clicked()
     play = new QProcess();
     play->setProgram(this->vlcLocation);
     play->setWorkingDirectory(workDir);
-    play->setArguments(QString("--fullscreen,--no-sub-autodetect-file," + episode).split(","));
+    play->setArguments(QString(options + episode).split(","));
     play->start();
 }
 
@@ -275,6 +277,16 @@ void MainWindow::on_close()
 
 void MainWindow::playMedia(QString thing)
 {
+    QString options;
+    if (this->fullScreen)
+    {
+        options = "--fullscreen,";
+    }
+    if (this->subs)
+    {
+        options = options + "--no-sub-autodetect-file,";
+    }
+
     QStringList thingSplit = thing.split(",");
 
     QString show = thingSplit[0];
@@ -286,7 +298,7 @@ void MainWindow::playMedia(QString thing)
     play = new QProcess();
     play->setProgram("C:/Program Files (x86)/VideoLAN/VLC/vlc.exe");
     play->setWorkingDirectory(workDir);
-    play->setArguments(QString("--fullscreen," + episode).split(","));
+    play->setArguments((options + episode).split(","));
     connect(play,SIGNAL(finished(int)),this,SLOT(videoFinished()));
     play->start();
 }
