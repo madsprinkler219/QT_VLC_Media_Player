@@ -13,11 +13,14 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    settings.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    settings.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    settings.ui
 
 #win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../Tools/lib_vlc/lib/ -llibvlc
 #else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../Tools/lib_vlc/lib/ -llibvlcd

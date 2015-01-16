@@ -4,22 +4,16 @@
 #include <QDebug>
 #include <QProcess>
 #include <QKeyEvent>
-//#include <vlc/libvlc.h>
-//#include <vlc/libvlc_media_player.h>
-//#include <vlc/libvlc_media.h>
-//#include <vlc/libvlc_events.h>
-//#include <vlc/libvlc_media_library.h>
-//#include <vlc/libvlc_media_discoverer.h>
-//#include <vlc/libvlc_media_list.h>
-//#include <vlc/libvlc_media_list_player.h>
-//#include <vlc/libvlc_structures.h>
-//#include <vlc/libvlc_version.h>
 #include <vlc/vlc.h>
-//#include <vlc/deprecated.h>
 #include <QMessageBox>
+#include <QSettings>
+#include "settings.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::MainWindow)
 {
+    QSettings settings("KevinPC");
+    this->vlcLocation = settings.value("vlcLocation").toString();
+
     ui->setupUi(this);
 
     play = new QProcess();
@@ -165,7 +159,7 @@ void MainWindow::on_pushButton_clicked()
 
     //Play Movie
     play = new QProcess();
-    play->setProgram("C:/Program Files (x86)/VideoLAN/VLC/vlc.exe");
+    play->setProgram(this->vlcLocation);
     play->setWorkingDirectory(mediaFolder[this->ui->listWidget->currentRow()]);
     play->setArguments(QString("--fullscreen," + mediaMovie[this->ui->listWidget->currentRow()]).split(","));
     connect(play,SIGNAL(finished(int)),this,SLOT(videoFinished()));
@@ -257,10 +251,9 @@ void MainWindow::on_pushButton_4_clicked()
     QString workDir = workDirMap[show + "," + season];
 
     play = new QProcess();
-    play->setProgram("C:/Program Files (x86)/VideoLAN/VLC/vlc.exe");
+    play->setProgram(this->vlcLocation);
     play->setWorkingDirectory(workDir);
     play->setArguments(QString("--fullscreen,--no-sub-autodetect-file," + episode).split(","));
-    connect(play,SIGNAL(finished(int)),this,SLOT(videoFinished()));
     play->start();
 }
 
@@ -458,4 +451,15 @@ void MainWindow::on_pushButton_3_clicked()
     QString show = this->ui->listWidget_2->currentItem()->text();
     QString season = this->ui->listWidget_3->currentItem()->text();
     playSeason(show,season);
+}
+
+void MainWindow::on_actionExit_triggered()
+{
+    this->close();
+}
+
+void MainWindow::on_actionSettings_triggered()
+{
+    Settings *set = new Settings();
+    set->show();
 }

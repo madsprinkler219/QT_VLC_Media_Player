@@ -34,6 +34,7 @@ public:
     void playMedia(QString);
     bool userEndClick;
     void addMediaFolder(QString);
+    QString vlcLocation;
 
 private slots:
     void on_pushButton_clicked();
@@ -48,6 +49,10 @@ private slots:
     void on_pushButton_2_clicked();
 
     void on_pushButton_3_clicked();
+
+    void on_actionExit_triggered();
+
+    void on_actionSettings_triggered();
 
 private:
     Ui::MainWindow *ui;
