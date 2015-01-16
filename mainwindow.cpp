@@ -24,7 +24,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::MainWin
     this->ui->listWidget_3->installEventFilter(this);
     this->ui->listWidget_4->installEventFilter(this);
 
-    addMediaFolder("//MEDIA-PC/Users/MEDIA/Desktop/Home Videos");
+    QList<QVariant> paths = settings.value("mediaPaths").toList();
+    for (int i=0;i<paths.size();i++)
+    {
+        addMediaFolder(paths[i].toString());
+    }
+
     addMedia();
 }
 
@@ -38,13 +43,6 @@ void MainWindow::addMediaFolder(QString path)
 
     searchPaths.clear();
     searchPaths.append(path);
-
-    mediaPath.clear();
-    mediaType.clear();
-    mediaMovie.clear();
-    mediaShow.clear();
-    mediaSeason.clear();
-    mediaEpisode.clear();
 
     for (int i=0;i<searchPaths.size();i++)
     {
