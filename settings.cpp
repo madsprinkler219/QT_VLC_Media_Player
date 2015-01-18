@@ -1,6 +1,7 @@
 #include "settings.h"
 #include "ui_settings.h"
 #include <QSettings>
+#include <QDebug>
 
 Settings::Settings(QWidget *parent) :
     QDialog(parent),
@@ -29,9 +30,18 @@ Settings::Settings(QWidget *parent) :
     {
         this->ui->checkBox->setChecked(true);
     }
+    else
+    {
+        this->ui->checkBox->setChecked(false);
+    }
+
     if (subs)
     {
         this->ui->checkBox_2->setChecked(true);
+    }
+    else
+    {
+        this->ui->checkBox_2->setChecked(false);
     }
 }
 
@@ -57,6 +67,8 @@ void Settings::on_pushButton_clicked()
     settings.setValue("mediaPaths",(QVariant) paths);
     settings.setValue("fullScreen",(QVariant) this->ui->checkBox->isChecked());
     settings.setValue("subtitles", (QVariant) this->ui->checkBox_2->isChecked());
+
+    qDebug() << settings.value("subtitles").toBool();
 
     this->close();
 }

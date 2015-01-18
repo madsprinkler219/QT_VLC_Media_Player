@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::MainWin
     this->ui->listWidget_2->installEventFilter(this);
     this->ui->listWidget_3->installEventFilter(this);
     this->ui->listWidget_4->installEventFilter(this);
+    this->ui->listWidget_5->installEventFilter(this);
 
     QList<QVariant> paths = settings.value("mediaPaths").toList();
     for (int i=0;i<paths.size();i++)
@@ -137,23 +138,46 @@ void MainWindow::addMedia()
     }
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::playMovie(QString path)
 {
+    QSettings settings("KevinPC");
+    this->vlcLocation = settings.value("vlcLocation").toString();
+    this->fullScreen = settings.value("fullScreen").toBool();
+    this->subs = settings.value("subtitles").toBool();
+
     QString options;
     if (this->fullScreen)
     {
         options = "--fullscreen,";
     }
-    if (this->subs)
+    if (!this->subs)
     {
         options = options + "--no-sub-autodetect-file,";
     }
 
-    //Play Movie
+    QStringList pathSplit = path.split("/",QString::SkipEmptyParts);
+    QString playPath;
+    if (path.left(2) == "//")
+    {
+        playPath = "//";
+    }
+    else if (path.left(1) == "/")
+    {
+        playPath = "/";
+    }
+
+    QString movieName;
+    for (int i=0;i<pathSplit.size()-1;i++)
+    {
+        playPath = playPath + pathSplit[i] + "/";
+    }
+    movieName = pathSplit.last();
+
     play = new QProcess();
     play->setProgram(this->vlcLocation);
-    play->setWorkingDirectory(mediaFolder[this->ui->listWidget->currentRow()]);
-    play->setArguments(QString(options + mediaMovie[this->ui->listWidget->currentRow()]).split(","));
+    play->setWorkingDirectory(playPath);
+
+    play->setArguments(QString(options + movieName).split(","));
     connect(play,SIGNAL(finished(int)),this,SLOT(videoFinished()));
     play->start();
 }
@@ -233,12 +257,17 @@ void MainWindow::on_listWidget_3_currentRowChanged(int currentRow)
 
 void MainWindow::on_pushButton_4_clicked()
 {
+    QSettings settings("KevinPC");
+    this->vlcLocation = settings.value("vlcLocation").toString();
+    this->fullScreen = settings.value("fullScreen").toBool();
+    this->subs = settings.value("subtitles").toBool();
+
     QString options;
     if (this->fullScreen)
     {
         options = "--fullscreen,";
     }
-    if (this->subs)
+    if (!this->subs)
     {
         options = options + "--no-sub-autodetect-file,";
     }
@@ -277,12 +306,17 @@ void MainWindow::on_close()
 
 void MainWindow::playMedia(QString thing)
 {
+    QSettings settings("KevinPC");
+    this->vlcLocation = settings.value("vlcLocation").toString();
+    this->fullScreen = settings.value("fullScreen").toBool();
+    this->subs = settings.value("subtitles").toBool();
+
     QString options;
     if (this->fullScreen)
     {
         options = "--fullscreen,";
     }
-    if (this->subs)
+    if (!this->subs)
     {
         options = options + "--no-sub-autodetect-file,";
     }
@@ -296,10 +330,11 @@ void MainWindow::playMedia(QString thing)
     QString workDir = workDirMap[show + "," + season];
 
     play = new QProcess();
-    play->setProgram("C:/Program Files (x86)/VideoLAN/VLC/vlc.exe");
+    play->setProgram(vlcLocation);
     play->setWorkingDirectory(workDir);
     play->setArguments((options + episode).split(","));
     connect(play,SIGNAL(finished(int)),this,SLOT(videoFinished()));
+
     play->start();
 }
 
@@ -314,8 +349,7 @@ void MainWindow::playShow(QString show)
         {
             if (!userEndClick)
             {
-                playMedia(show + "," + seasons[i] + "," + episodes[j]);
-                play->waitForFinished(-1);
+                this->ui->listWidget_5->addItem(episodes[j]);
             }
         }
     }
@@ -329,8 +363,7 @@ void MainWindow::playSeason(QString show,QString season)
     {
         if (!userEndClick)
         {
-            playMedia(show + "," + season + "," + episodes[j]);
-            play->waitForFinished(-1);
+            this->ui->listWidget_5->addItem(episodes[j]);
         }
     }
 }
@@ -355,14 +388,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         else if (keyEvent->key() == Qt::Key_Left)
         {
             changeFocus(-1);
-        }
-        else if (keyEvent->key() == Qt::Key_M)
-        {
-            on_pushButton_clicked();
-        }
-        else if (keyEvent->key() == Qt::Key_P)
-        {
-            on_pushButton_4_clicked();
         }
         else if (keyEvent->key() == Qt::Key_S)
         {
@@ -413,6 +438,11 @@ void MainWindow::changeFocus(int change)
         }
         else if (this->currentFocus == 4)
         {
+            this->currentFocus = 5;
+            this->ui->listWidget_5->setFocus();
+        }
+        else if (this->currentFocus == 5)
+        {
             this->currentFocus = 1;
             this->ui->listWidget->setFocus();
         }
@@ -421,8 +451,8 @@ void MainWindow::changeFocus(int change)
     {
         if (this->currentFocus == 1)
         {
-            this->currentFocus = 4;
-            this->ui->listWidget_4->setFocus();
+            this->currentFocus = 5;
+            this->ui->listWidget_5->setFocus();
         }
         else if (this->currentFocus == 2)
         {
@@ -439,28 +469,12 @@ void MainWindow::changeFocus(int change)
             this->currentFocus = 3;
             this->ui->listWidget_3->setFocus();
         }
+        else if (this->currentFocus == 5)
+        {
+            this->currentFocus = 4;
+            this->ui->listWidget_4->setFocus();
+        }
     }
-}
-
-void MainWindow::on_pushButton_5_clicked()
-{
-    userEndClick = true;
-    play->close();
-}
-
-void MainWindow::on_pushButton_2_clicked()
-{
-    //Watch Show
-    QString show = this->ui->listWidget_2->currentItem()->text();
-    playShow(show);
-}
-
-void MainWindow::on_pushButton_3_clicked()
-{
-    //Watch Season
-    QString show = this->ui->listWidget_2->currentItem()->text();
-    QString season = this->ui->listWidget_3->currentItem()->text();
-    playSeason(show,season);
 }
 
 void MainWindow::on_actionExit_triggered()
@@ -472,4 +486,90 @@ void MainWindow::on_actionSettings_triggered()
 {
     Settings *set = new Settings();
     set->show();
+}
+
+void MainWindow::on_pushButton_6_clicked()
+{
+    //Add to playlist
+
+    if (this->currentFocus == 1)
+    {
+        this->ui->listWidget_5->addItem(this->ui->listWidget->currentItem()->text());
+        this->playlistPath.append(mediaPath[this->ui->listWidget->currentIndex().row()]);
+        this->ui->listWidget->setFocus();
+    }
+    else if (this->currentFocus == 2)
+    {
+        QStringList seasons = this->seasonMap[this->ui->listWidget_2->currentItem()->text()];
+        for (int i=0;i<seasons.size();i++)
+        {
+            QStringList episodes = this->episodeMap[this->ui->listWidget_2->currentItem()->text() + "," + seasons[i]];
+            for (int j=0;j<episodes.size();j++)
+            {
+                this->ui->listWidget_5->addItem(episodes[j]);
+                this->playlistPath.append(this->ui->listWidget_2->currentItem()->text() + "," + seasons[i] + "," + episodes[j]);
+            }
+        }
+        this->ui->listWidget_2->setFocus();
+    }
+    else if (this->currentFocus == 3)
+    {
+        QStringList episodes = this->episodeMap[this->ui->listWidget_2->currentItem()->text() + "," + this->ui->listWidget_3->currentItem()->text()];
+        for (int j=0;j<episodes.size();j++)
+        {
+            QString show = this->ui->listWidget_2->currentItem()->text();
+            QString season = this->ui->listWidget_3->currentItem()->text();
+            this->ui->listWidget_5->addItem(episodes[j]);
+            this->playlistPath.append(show + "," + season + "," + episodes[j]);
+        }
+    }
+    else if (this->currentFocus == 4)
+    {
+        QString show = this->ui->listWidget_2->currentItem()->text();
+        QString season = this->ui->listWidget_3->currentItem()->text();
+        QString episode = this->ui->listWidget_5->currentItem()->text();
+        this->ui->listWidget_4->addItem(episode);
+        this->playlistPath.append(show + "," + season + "," + episode);
+    }
+}
+
+void MainWindow::on_pushButton_8_clicked()
+{
+    //Clear Playlist
+    this->ui->listWidget_5->clear();
+    this->playlistPath.clear();
+}
+
+void MainWindow::on_pushButton_7_clicked()
+{
+    //Play Playlist
+
+    this->userEndClick = false;
+
+    while (this->playlistPath.size() > 0 && !this->userEndClick)
+    {
+        if (this->playlistPath.first().split(",").size() == 1)
+        {
+            if (!this->userEndClick)
+            {
+                playMovie(this->playlistPath.first());
+                play->waitForFinished(-1);
+                this->playlistPath.pop_front();
+            }
+        }
+        else
+        {
+            if (!this->userEndClick)
+            {
+                playMedia(this->playlistPath.first());
+                play->waitForFinished(-1);
+                this->playlistPath.pop_front();
+            }
+        }
+        this->ui->listWidget_5->clear();
+        for (int i=0;i<this->playlistPath.size();i++)
+        {
+            this->ui->listWidget_5->addItem(this->playlistPath[i].split(",").last());
+        }
+    }
 }
