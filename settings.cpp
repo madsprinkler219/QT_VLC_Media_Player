@@ -122,6 +122,7 @@ void Settings::on_pushButton_clicked()
     QTextStream out(&file);
     out << saveSettings;
 
+    out.flush();
     file.close();
 }
 

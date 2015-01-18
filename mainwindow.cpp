@@ -8,10 +8,15 @@
 #include <QMessageBox>
 #include <QSettings>
 #include "settings.h"
+#include "mediacontrolsite.h"
+#include "serverthread.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    t = new ServerThread(this);
+    t->run();
 
     play = new QProcess();
 
@@ -31,6 +36,47 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::MainWin
     }
 
     addMedia();
+}
+
+void MainWindow::userDataWritten()
+{
+    QString letter = this->t->site->socket->readAll();
+
+    qDebug() << letter;
+
+    if (letter == "\r\n")
+    {
+        runSiteCommand(this->siteCommands);
+        this->siteCommands.clear();
+    }
+    else
+    {
+        this->siteCommands = this->siteCommands + letter;
+    }
+}
+
+void MainWindow::runSiteCommand(QString command)
+{
+    if (command == "up")
+    {
+        QObject *obj = new QObject();
+        QKeyEvent* keyEvent = new QKeyEvent(QEvent::KeyPress,Qt::Key_Up,Qt::NoModifier);
+        eventFilter(obj,(QEvent*) keyEvent);
+    }
+    else if (command == "down")
+    {
+        QObject *obj = new QObject();
+        QKeyEvent* keyEvent = new QKeyEvent(QEvent::KeyPress,Qt::Key_Down,Qt::NoModifier);
+        eventFilter(obj,(QEvent*) keyEvent);
+    }
+    else if (command == "right")
+    {
+        changeFocus(1);
+    }
+    else if (command == "left")
+    {
+        changeFocus(-1);
+    }
 }
 
 void MainWindow::addMediaFolder(QString path)
@@ -312,10 +358,12 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         if (keyEvent->key() == Qt::Key_Up)
         {
             moveIndex(-1);
+            return true;
         }
         else if (keyEvent->key() == Qt::Key_Down)
         {
             moveIndex(1);
+            return true;
         }
         else if (keyEvent->key() == Qt::Key_U)
         {
@@ -376,7 +424,26 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 void MainWindow::moveIndex(int move)
 {
-
+    if (this->currentFocus == 1)
+    {
+        this->ui->listWidget->setCurrentRow(this->ui->listWidget->currentRow()+move);
+    }
+    else if (this->currentFocus == 2)
+    {
+        this->ui->listWidget_2->setCurrentRow(this->ui->listWidget_2->currentRow()+move);
+    }
+    else if (this->currentFocus == 3)
+    {
+        this->ui->listWidget_3->setCurrentRow(this->ui->listWidget_3->currentRow()+move);
+    }
+    else if (this->currentFocus == 4)
+    {
+        this->ui->listWidget_4->setCurrentRow(this->ui->listWidget_4->currentRow()+move);
+    }
+    else if (this->currentFocus == 5)
+    {
+        this->ui->listWidget_5->setCurrentRow(this->ui->listWidget_5->currentRow()+move);
+    }
 }
 
 void MainWindow::changeFocus(int change)

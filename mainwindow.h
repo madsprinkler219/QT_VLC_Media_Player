@@ -5,6 +5,8 @@
 #include <QProcess>
 #include <QHash>
 #include <QListWidget>
+#include "mediacontrolsite.h"
+#include "serverthread.h"
 
 namespace Ui {
 class MainWindow;
@@ -38,6 +40,10 @@ public:
     bool fullScreen,subs;
     QVector<QString> playlistPath;
     void playMovie(QString);
+    MediaControlSite *site;
+    QString siteCommands;
+    void runSiteCommand(QString);
+    ServerThread *t;
 
 private slots:
     void videoFinished();
@@ -49,6 +55,9 @@ private slots:
     void on_pushButton_6_clicked();
     void on_pushButton_8_clicked();
     void on_pushButton_7_clicked();
+
+public slots:
+    void userDataWritten();
 
 private:
     Ui::MainWindow *ui;
