@@ -381,6 +381,28 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         {
             moveIndex(1);
         }
+        else if (keyEvent->key() == Qt::Key_U)
+        {
+            if (this->currentFocus == 5 && this->ui->listWidget_5->currentRow() > 0)
+            {
+                QString curIndex = this->ui->listWidget_5->currentItem()->text();
+                QString newIndex = this->ui->listWidget_5->item(this->ui->listWidget_5->currentRow()-1)->text();
+                this->ui->listWidget_5->currentItem()->setText(newIndex);
+                this->ui->listWidget_5->item(this->ui->listWidget_5->currentRow()-1)->setText(curIndex);
+                this->ui->listWidget_5->setCurrentRow(this->ui->listWidget_5->currentRow()-1);
+            }
+        }
+        else if (keyEvent->key() == Qt::Key_D)
+        {
+            if (this->currentFocus == 5 && this->ui->listWidget_5->currentRow() < this->ui->listWidget_5->count()-1)
+            {
+                QString curIndex = this->ui->listWidget_5->currentItem()->text();
+                QString newIndex = this->ui->listWidget_5->item(this->ui->listWidget_5->currentRow()+1)->text();
+                this->ui->listWidget_5->currentItem()->setText(newIndex);
+                this->ui->listWidget_5->item(this->ui->listWidget_5->currentRow()+1)->setText(curIndex);
+                this->ui->listWidget_5->setCurrentRow(this->ui->listWidget_5->currentRow()+1);
+            }
+        }
         else if (keyEvent->key() == Qt::Key_Right)
         {
             changeFocus(1);
@@ -388,14 +410,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         else if (keyEvent->key() == Qt::Key_Left)
         {
             changeFocus(-1);
-        }
-        else if (keyEvent->key() == Qt::Key_S)
-        {
-            playShow(this->ui->listWidget_2->currentItem()->text());
-        }
-        else if (keyEvent->key() == Qt::Key_A)
-        {
-            playSeason(this->ui->listWidget_2->currentItem()->text(),this->ui->listWidget_3->currentItem()->text());
         }
         else if (keyEvent->key() == Qt::Key_E)
         {
@@ -531,6 +545,8 @@ void MainWindow::on_pushButton_6_clicked()
         this->ui->listWidget_4->addItem(episode);
         this->playlistPath.append(show + "," + season + "," + episode);
     }
+
+    this->ui->listWidget_5->setCurrentRow(0);
 }
 
 void MainWindow::on_pushButton_8_clicked()
@@ -570,6 +586,7 @@ void MainWindow::on_pushButton_7_clicked()
         for (int i=0;i<this->playlistPath.size();i++)
         {
             this->ui->listWidget_5->addItem(this->playlistPath[i].split(",").last());
+            this->ui->listWidget_5->setCurrentRow(0);
         }
     }
 }
