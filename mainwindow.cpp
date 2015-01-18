@@ -11,14 +11,11 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::MainWindow)
 {
-    QSettings settings("KevinPC");
-    this->vlcLocation = settings.value("vlcLocation").toString();
-    this->fullScreen = settings.value("fullScreen").toBool();
-    this->subs = settings.value("subtitles").toBool();
-
     ui->setupUi(this);
 
     play = new QProcess();
+
+    QSettings settings("KevinPC");
 
     this->currentFocus = 1;
     this->ui->listWidget->installEventFilter(this);
@@ -140,21 +137,6 @@ void MainWindow::addMedia()
 
 void MainWindow::playMovie(QString path)
 {
-    QSettings settings("KevinPC");
-    this->vlcLocation = settings.value("vlcLocation").toString();
-    this->fullScreen = settings.value("fullScreen").toBool();
-    this->subs = settings.value("subtitles").toBool();
-
-    QString options;
-    if (this->fullScreen)
-    {
-        options = "--fullscreen,";
-    }
-    if (!this->subs)
-    {
-        options = options + "--no-sub-autodetect-file,";
-    }
-
     QStringList pathSplit = path.split("/",QString::SkipEmptyParts);
     QString playPath;
     if (path.left(2) == "//")
@@ -177,7 +159,7 @@ void MainWindow::playMovie(QString path)
     play->setProgram(this->vlcLocation);
     play->setWorkingDirectory(playPath);
 
-    play->setArguments(QString(options + movieName).split(","));
+    play->setArguments(QString(movieName).split(","));
     connect(play,SIGNAL(finished(int)),this,SLOT(videoFinished()));
     play->start();
 }
@@ -255,37 +237,6 @@ void MainWindow::on_listWidget_3_currentRowChanged(int currentRow)
     this->ui->listWidget_4->setCurrentRow(0);
 }
 
-void MainWindow::on_pushButton_4_clicked()
-{
-    QSettings settings("KevinPC");
-    this->vlcLocation = settings.value("vlcLocation").toString();
-    this->fullScreen = settings.value("fullScreen").toBool();
-    this->subs = settings.value("subtitles").toBool();
-
-    QString options;
-    if (this->fullScreen)
-    {
-        options = "--fullscreen,";
-    }
-    if (!this->subs)
-    {
-        options = options + "--no-sub-autodetect-file,";
-    }
-
-    //Play show
-    QString show = this->ui->listWidget_2->currentItem()->text();
-    QString season = this->ui->listWidget_3->currentItem()->text();
-    QString episode = this->ui->listWidget_4->currentItem()->text();
-
-    QString workDir = workDirMap[show + "," + season];
-
-    play = new QProcess();
-    play->setProgram(this->vlcLocation);
-    play->setWorkingDirectory(workDir);
-    play->setArguments(QString(options + episode).split(","));
-    play->start();
-}
-
 void MainWindow::on_close()
 {
     QMessageBox *box = new QMessageBox();
@@ -306,21 +257,6 @@ void MainWindow::on_close()
 
 void MainWindow::playMedia(QString thing)
 {
-    QSettings settings("KevinPC");
-    this->vlcLocation = settings.value("vlcLocation").toString();
-    this->fullScreen = settings.value("fullScreen").toBool();
-    this->subs = settings.value("subtitles").toBool();
-
-    QString options;
-    if (this->fullScreen)
-    {
-        options = "--fullscreen,";
-    }
-    if (!this->subs)
-    {
-        options = options + "--no-sub-autodetect-file,";
-    }
-
     QStringList thingSplit = thing.split(",");
 
     QString show = thingSplit[0];
@@ -332,7 +268,7 @@ void MainWindow::playMedia(QString thing)
     play = new QProcess();
     play->setProgram(vlcLocation);
     play->setWorkingDirectory(workDir);
-    play->setArguments((options + episode).split(","));
+    play->setArguments((episode).split(","));
     connect(play,SIGNAL(finished(int)),this,SLOT(videoFinished()));
 
     play->start();
@@ -571,6 +507,9 @@ void MainWindow::on_pushButton_8_clicked()
 void MainWindow::on_pushButton_7_clicked()
 {
     //Play Playlist
+
+    QSettings settings("KevinPC");
+    this->vlcLocation = settings.value("vlcLocation").toString();
 
     this->userEndClick = false;
 

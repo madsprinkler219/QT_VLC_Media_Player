@@ -2,6 +2,8 @@
 #include "ui_settings.h"
 #include <QSettings>
 #include <QDebug>
+#include <QFile>
+#include <QDir>
 
 Settings::Settings(QWidget *parent) :
     QDialog(parent),
@@ -11,6 +13,7 @@ Settings::Settings(QWidget *parent) :
 
     QSettings settings("KevinPC");
     this->ui->lineEdit->setText(settings.value("vlcLocation").toString());
+    this->ui->lineEdit_2->setText(settings.value("configFile").toString());
 
     this->ui->tableWidget->setColumnCount(1);
 
@@ -54,6 +57,7 @@ void Settings::on_pushButton_clicked()
 {
     QSettings settings("KevinPC");
     settings.setValue("vlcLocation",this->ui->lineEdit->text());
+    settings.setValue("configFile",this->ui->lineEdit_2->text());
 
     QList<QString> paths;
     for (int i=0;i<this->ui->tableWidget->rowCount();i++)
@@ -68,9 +72,57 @@ void Settings::on_pushButton_clicked()
     settings.setValue("fullScreen",(QVariant) this->ui->checkBox->isChecked());
     settings.setValue("subtitles", (QVariant) this->ui->checkBox_2->isChecked());
 
-    qDebug() << settings.value("subtitles").toBool();
-
     this->close();
+
+    QString saveSettings;
+    QFile testFile(this->ui->lineEdit_2->text());
+    if (testFile.exists())
+    {
+        testFile.open(QIODevice::ReadOnly);
+        QTextStream file(&testFile);
+        while (!file.atEnd())
+        {
+            QString line = file.readLine();
+            if (line.contains("fullscreen="))
+            {
+                if (settings.value("fullScreen").toBool())
+                {
+                    saveSettings = saveSettings + "fullscreen=1" + "\n";
+                }
+                else
+                {
+                    saveSettings = saveSettings + "fullscreen=0" + "\n";
+                }
+            }
+            else if (line.contains("spu=") && line.size() < 7)
+            {
+                if (settings.value("subtitles").toBool())
+                {
+                    saveSettings = saveSettings + "spu=1" + "\n";
+                }
+                else
+                {
+                    saveSettings = saveSettings + "spu=0" + "\n";
+                }
+            }
+            else if (line.size() == 0)
+            {
+                saveSettings = saveSettings + "\n";
+            }
+            else
+            {
+                saveSettings = saveSettings + line + "\n";
+            }
+        }
+    }
+    testFile.close();
+
+    QFile file(settings.value("configFile").toString());
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+    out << saveSettings;
+
+    file.close();
 }
 
 void Settings::on_pushButton_2_clicked()

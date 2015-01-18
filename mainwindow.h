@@ -43,7 +43,6 @@ private slots:
     void videoFinished();
     void on_listWidget_2_currentRowChanged(int currentRow);
     void on_listWidget_3_currentRowChanged(int currentRow);
-    void on_pushButton_4_clicked();
     void on_close();
     void on_actionExit_triggered();
     void on_actionSettings_triggered();
