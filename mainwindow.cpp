@@ -403,6 +403,18 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 this->ui->listWidget_5->setCurrentRow(this->ui->listWidget_5->currentRow()+1);
             }
         }
+        else if (keyEvent->key() == Qt::Key_A)
+        {
+            on_pushButton_6_clicked();
+        }
+        else if (keyEvent->key() == Qt::Key_C)
+        {
+            on_pushButton_8_clicked();
+        }
+        else if (keyEvent->key() == Qt::Key_P)
+        {
+            on_pushButton_7_clicked();
+        }
         else if (keyEvent->key() == Qt::Key_Right)
         {
             changeFocus(1);
