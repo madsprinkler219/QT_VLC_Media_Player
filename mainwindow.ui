@@ -158,6 +158,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>[R] Remove Item from Playlist</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="pushButton_8">
         <property name="text">
          <string>[C] Clear Playlist</string>

@@ -166,19 +166,22 @@ void MainWindow::playMovie(QString path)
 
 void MainWindow::videoFinished()
 {
-    QMessageBox *box = new QMessageBox();
-    box->setText("Continue with next episode?");
-    box->addButton(QMessageBox::Yes);
-    box->addButton(QMessageBox::No);
-    int ret = box->exec();
+    if (this->playlistPath.size() > 1)
+    {
+        QMessageBox *box = new QMessageBox();
+        box->setText("Continue with next episode?");
+        box->addButton(QMessageBox::Yes);
+        box->addButton(QMessageBox::No);
+        int ret = box->exec();
 
-    if (ret == 16384)
-    {
-        this->userEndClick = false;
-    }
-    else if (ret == 65536)
-    {
-        this->userEndClick = true;
+        if (ret == 16384)
+        {
+            this->userEndClick = false;
+        }
+        else if (ret == 65536)
+        {
+            this->userEndClick = true;
+        }
     }
 }
 
@@ -325,6 +328,16 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 QString newIndex = this->ui->listWidget_5->item(this->ui->listWidget_5->currentRow()-1)->text();
                 this->ui->listWidget_5->currentItem()->setText(newIndex);
                 this->ui->listWidget_5->item(this->ui->listWidget_5->currentRow()-1)->setText(curIndex);
+
+                int selRow = this->ui->listWidget_5->currentRow();
+                int moveRow = this->ui->listWidget_5->currentRow()-1;
+
+                QString selItem = this->playlistPath[selRow];
+                QString moveItem = this->playlistPath[moveRow];
+
+                this->playlistPath[selRow] = moveItem;
+                this->playlistPath[moveRow] = selItem;
+
                 this->ui->listWidget_5->setCurrentRow(this->ui->listWidget_5->currentRow()-1);
             }
         }
@@ -336,6 +349,16 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
                 QString newIndex = this->ui->listWidget_5->item(this->ui->listWidget_5->currentRow()+1)->text();
                 this->ui->listWidget_5->currentItem()->setText(newIndex);
                 this->ui->listWidget_5->item(this->ui->listWidget_5->currentRow()+1)->setText(curIndex);
+
+                int selRow = this->ui->listWidget_5->currentRow();
+                int moveRow = this->ui->listWidget_5->currentRow()+1;
+
+                QString selItem = this->playlistPath[selRow];
+                QString moveItem = this->playlistPath[moveRow];
+
+                this->playlistPath[selRow] = moveItem;
+                this->playlistPath[moveRow] = selItem;
+
                 this->ui->listWidget_5->setCurrentRow(this->ui->listWidget_5->currentRow()+1);
             }
         }
@@ -350,6 +373,10 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         else if (keyEvent->key() == Qt::Key_P)
         {
             on_pushButton_7_clicked();
+        }
+        else if (keyEvent->key() == Qt::Key_R)
+        {
+            on_pushButton_clicked();
         }
         else if (keyEvent->key() == Qt::Key_Right)
         {
@@ -538,6 +565,30 @@ void MainWindow::on_pushButton_7_clicked()
         {
             this->ui->listWidget_5->addItem(this->playlistPath[i].split(",").last());
             this->ui->listWidget_5->setCurrentRow(0);
+        }
+    }
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    int curItem = this->ui->listWidget_5->currentRow();
+
+    if (this->currentFocus == 5)
+    {
+        this->playlistPath.remove(this->ui->listWidget_5->currentRow());
+
+        this->ui->listWidget_5->clear();
+        for (int i=0;i<this->playlistPath.size();i++)
+        {
+            this->ui->listWidget_5->addItem(this->playlistPath[i].split(",").last());
+            if (this->ui->listWidget_5->count() > curItem)
+            {
+                this->ui->listWidget_5->setCurrentRow(curItem);
+            }
+            else if (this->ui->listWidget_5->count() > 0)
+            {
+                this->ui->listWidget_5->setCurrentRow(curItem-1);
+            }
         }
     }
 }
