@@ -491,8 +491,40 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_actionSettings_triggered()
 {
-    Settings *set = new Settings();
+    Settings *set = new Settings(this);
+    connect(set,SIGNAL(settingsChanged()),this,SLOT(on_settingsChanged()));
     set->show();
+}
+
+void MainWindow::on_settingsChanged()
+{
+    this->ui->listWidget->clear();
+    this->ui->listWidget_2->clear();
+    this->ui->listWidget_3->clear();
+    this->ui->listWidget_4->clear();
+    this->ui->listWidget_5->clear();
+
+    mediaType.clear();
+    mediaPath.clear();
+    mediaMovie.clear();
+    mediaFolder.clear();
+    seasonMap.clear();
+    episodeMap.clear();
+    pathMap.clear();
+    workDirMap.clear();
+    searchPaths.clear();
+    mediaSeason.clear();
+    mediaEpisode.clear();
+
+    QSettings settings("KevinPC");
+
+    QList<QVariant> paths = settings.value("mediaPaths").toList();
+    for (int i=0;i<paths.size();i++)
+    {
+        addMediaFolder(paths[i].toString());
+    }
+
+    addMedia();
 }
 
 void MainWindow::on_pushButton_6_clicked()

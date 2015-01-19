@@ -123,6 +123,8 @@ void Settings::on_pushButton_clicked()
     out << saveSettings;
 
     file.close();
+
+    emit settingsChanged();
 }
 
 void Settings::on_pushButton_2_clicked()
@@ -136,4 +138,13 @@ void Settings::on_pushButton_3_clicked()
     this->ui->tableWidget->setItem(this->ui->tableWidget->rowCount()-1,0,new QTableWidgetItem(""));
     this->ui->tableWidget->setRowHeight(this->ui->tableWidget->rowCount()-1,18);
     this->ui->tableWidget->setColumnWidth(0,350);
+}
+
+void Settings::on_pushButton_4_clicked()
+{
+    if (this->ui->tableWidget->selectedItems().size() == 1)
+    {
+        int curIndex = this->ui->tableWidget->currentRow();
+        this->ui->tableWidget->removeRow(curIndex);
+    }
 }
