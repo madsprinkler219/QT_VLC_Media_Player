@@ -169,7 +169,16 @@ void MainWindow::videoFinished()
     if (this->playlistPath.size() > 1)
     {
         QMessageBox *box = new QMessageBox();
-        box->setText("Continue with next episode?");
+        QStringList split = this->playlistPath[1].split(",");
+        if (split.size() > 1)
+        {
+            box->setText("Continue with next item in playlist:\n\nShow: " + split[0] + "\nSeason: " + split[1] + "\nEpisode: " + split[2]);
+        }
+        else
+        {
+            QStringList split2 = this->playlistPath[1].split("/");
+            box->setText("Continue with next item in playlist:\n\n" + split2.last());
+        }
         box->addButton(QMessageBox::Yes);
         box->addButton(QMessageBox::No);
         int ret = box->exec();
@@ -340,6 +349,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
                 this->ui->listWidget_5->setCurrentRow(this->ui->listWidget_5->currentRow()-1);
             }
+            return true;
         }
         else if (keyEvent->key() == Qt::Key_D)
         {
@@ -361,30 +371,37 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
                 this->ui->listWidget_5->setCurrentRow(this->ui->listWidget_5->currentRow()+1);
             }
+            return true;
         }
         else if (keyEvent->key() == Qt::Key_A)
         {
             on_pushButton_6_clicked();
+            return true;
         }
         else if (keyEvent->key() == Qt::Key_C)
         {
             on_pushButton_8_clicked();
+            return true;
         }
         else if (keyEvent->key() == Qt::Key_P)
         {
             on_pushButton_7_clicked();
+            return true;
         }
         else if (keyEvent->key() == Qt::Key_R)
         {
             on_pushButton_clicked();
+            return true;
         }
         else if (keyEvent->key() == Qt::Key_Right)
         {
             changeFocus(1);
+            return true;
         }
         else if (keyEvent->key() == Qt::Key_Left)
         {
             changeFocus(-1);
+            return true;
         }
         else if (keyEvent->key() == Qt::Key_E)
         {
@@ -392,6 +409,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
             {
                 play->close();
             }
+            return true;
         }
         else
         {
@@ -571,23 +589,33 @@ void MainWindow::on_pushButton_7_clicked()
 
 void MainWindow::on_pushButton_clicked()
 {
-    int curItem = this->ui->listWidget_5->currentRow();
-
-    if (this->currentFocus == 5)
+    if (this->ui->listWidget_5->count() > 0)
     {
-        this->playlistPath.remove(this->ui->listWidget_5->currentRow());
+        int curItem = this->ui->listWidget_5->currentRow();
 
-        this->ui->listWidget_5->clear();
-        for (int i=0;i<this->playlistPath.size();i++)
+        if (this->currentFocus == 5)
         {
-            this->ui->listWidget_5->addItem(this->playlistPath[i].split(",").last());
-            if (this->ui->listWidget_5->count() > curItem)
+            this->playlistPath.remove(this->ui->listWidget_5->currentRow());
+
+            this->ui->listWidget_5->clear();
+            for (int i=0;i<this->playlistPath.size();i++)
             {
-                this->ui->listWidget_5->setCurrentRow(curItem);
-            }
-            else if (this->ui->listWidget_5->count() > 0)
-            {
-                this->ui->listWidget_5->setCurrentRow(curItem-1);
+                if (this->playlistPath[i].split(",").size() > 1)
+                {
+                    this->ui->listWidget_5->addItem(this->playlistPath[i].split(",").last());
+                }
+                else
+                {
+                    this->ui->listWidget_5->addItem(this->playlistPath[i].split("/").last());
+                }
+                if (this->ui->listWidget_5->count() > curItem)
+                {
+                    this->ui->listWidget_5->setCurrentRow(curItem);
+                }
+                else if (this->ui->listWidget_5->count() > 0)
+                {
+                    this->ui->listWidget_5->setCurrentRow(curItem-1);
+                }
             }
         }
     }
