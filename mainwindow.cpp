@@ -534,8 +534,8 @@ void MainWindow::on_pushButton_6_clicked()
     {
         QString show = this->ui->listWidget_2->currentItem()->text();
         QString season = this->ui->listWidget_3->currentItem()->text();
-        QString episode = this->ui->listWidget_5->currentItem()->text();
-        this->ui->listWidget_4->addItem(episode);
+        QString episode = this->ui->listWidget_4->currentItem()->text();
+        this->ui->listWidget_5->addItem(episode);
         this->playlistPath.append(show + "," + season + "," + episode);
     }
 

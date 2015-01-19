@@ -87,6 +87,16 @@
        </layout>
       </item>
       <item>
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Episodes</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <widget class="QListWidget" name="listWidget_4"/>
