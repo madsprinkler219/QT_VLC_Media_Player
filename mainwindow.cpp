@@ -77,6 +77,18 @@ void MainWindow::runSiteCommand(QString command)
     {
         changeFocus(-1);
     }
+    else if (command == "add")
+    {
+        on_pushButton_6_clicked();
+    }
+    else if (command == "clear")
+    {
+        on_pushButton_8_clicked();
+    }
+    else if (command == "play")
+    {
+        on_pushButton_7_clicked();
+    }
 }
 
 void MainWindow::addMediaFolder(QString path)

@@ -20,9 +20,8 @@ void MediaControlSite::newConnection()
 {
     socket = server->nextPendingConnection();
 
+    connect(socket,SIGNAL(readyRead()),this->parent()->parent(),SLOT(userDataWritten()));
+
     socket->write("Hello\r\n");
     socket->flush();
-    //socket->waitForBytesWritten(3000);
-
-    connect(socket,SIGNAL(readyRead()),this->parent()->parent(),SLOT(userDataWritten()),Qt::DirectConnection);
 }
