@@ -19,27 +19,26 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    QVector<QString> searchPaths,mediaPath,mediaType,mediaMovie,mediaShow,mediaSeason,mediaEpisode,mediaFolder;
+
+    QVector<QString> searchPaths;
     void addMedia();
     QProcess *play;
-    QHash<QString,QStringList> seasonMap;
-    QHash<QString,QStringList> episodeMap;
-    QHash<QString,QString> pathMap;
-    QHash<QString,QString> workDirMap;
+
+    QMap<QString,QString> movieList,tvShows,workDirMap,fileNameMap;
+    QMap<QString,QVector<QString> > seasonMap;
+    QMap<QString,QVector<QString> > episodeMap;
+
     void testVLC();
     void changeFocus(int);
     void moveIndex(int);
     bool eventFilter(QObject *obj, QEvent *event);
     int currentFocus;
-    void playShow(QString);
-    void playSeason(QString,QString);
     void playMedia(QString);
     bool userEndClick;
     void addMediaFolder(QString);
     QString vlcLocation;
     bool fullScreen,subs;
     QVector<QString> playlistPath;
-    void playMovie(QString);
     MediaControlSite *site;
     QString siteCommands;
     void runSiteCommand(QString);
@@ -55,6 +54,8 @@ private slots:
     void on_pushButton_6_clicked();
     void on_pushButton_8_clicked();
     void on_pushButton_7_clicked();
+    void on_settingsChanged();
+    void on_pushButton_clicked();
 
 public slots:
     void userDataWritten();
