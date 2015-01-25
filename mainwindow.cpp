@@ -226,7 +226,6 @@ void MainWindow::on_close()
 void MainWindow::playMedia(QString path)
 {
     QString workDir = workDirMap.value(path);
-    qDebug() << path << " " << workDir;
 
     play = new QProcess();
     play->setProgram(vlcLocation);
